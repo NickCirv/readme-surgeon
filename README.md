@@ -1,22 +1,87 @@
-# readme-surgeon
-
-> Brutal README feedback + auto-fix. Give it any GitHub repo or local file, get a savage roast, then an improved version.
-
 ![banner](./banner.svg)
 
-[![npm version](https://img.shields.io/npm/v/readme-surgeon?color=cyan)](https://www.npmjs.com/package/readme-surgeon)
-[![license](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
-[![node](https://img.shields.io/node/v/readme-surgeon)](https://nodejs.org)
+# readme-surgeon
+
+> Brutal README feedback + auto-fix.
+
+[![npm version](https://img.shields.io/npm/v/readme-surgeon?color=%2367E8F9&label=npm)](https://www.npmjs.com/package/readme-surgeon)
+[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/NickCirv/readme-surgeon?style=flat)](https://github.com/NickCirv/readme-surgeon/stargazers)
 
 ---
 
-## What It Does
+## The Problem
 
-readme-surgeon scores your README across 5 categories (0–100 total), tells you exactly what's wrong, then rewrites it. Powered by Claude.
+Your README is the first thing developers see. And it's terrible. You know it. We know it. readme-surgeon gives you a score card, roasts what's wrong line by line, and hands you an improved version. Powered by Claude.
 
-**Scoring rubric:**
+---
 
-| Category | Max | What gets you points |
+## Quick Start
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+
+# Roast a GitHub repo
+npx readme-surgeon https://github.com/user/repo
+
+# Roast a local file
+npx readme-surgeon ./README.md
+
+# Fix it in place
+npx readme-surgeon --fix ./README.md
+```
+
+---
+
+## Example Output
+
+```
+  ┌─────────────────────────────────────────┐
+  │         README SURGEON — REPORT CARD    │
+  └─────────────────────────────────────────┘
+
+  First Impression    ████████████████░░░░  16/20
+  Quick Start         ████████░░░░░░░░░░░░   8/20
+  Completeness        ████████████░░░░░░░░  12/20
+  Visual Appeal       ██████░░░░░░░░░░░░░░   6/20
+  Honesty             ████████████████████  20/20
+
+  ─────────────────────────────────────────
+  TOTAL               ██████████░░░░░░░░░░  62/100
+
+  Grade: D
+
+  ─────────────────────────────────────────
+  Issues:
+
+  1. No quick start. I don't know what this does in 10 seconds.
+  2. Install section buried after 300 words of philosophy.
+  3. No badges. Is this even published? Is it alive?
+  4. "powerful", "seamless", "cutting-edge" — meaningless buzzwords × 3.
+  5. No example output. You expect me to install something I've never seen work?
+
+  ─────────────────────────────────────────
+  Improved README printed below.
+```
+
+---
+
+## Features
+
+- Scores any README across 5 categories (0–100 total)
+- Specific, numbered feedback — not vague suggestions
+- Claude rewrites the README fixing every identified issue
+- Two decoupled AI calls: analysis and rewrite don't influence each other
+- Works on GitHub URLs or local files
+- `--fix` flag overwrites your local file with the improved version
+- `--json` flag for CI pipelines and automated checks
+- `--score` flag for a fast check without the full rewrite
+
+---
+
+## Scoring Rubric
+
+| Category | Max | What earns points |
 |---|---|---|
 | First Impression | 20 | Hook, clarity, purpose in 5 seconds |
 | Quick Start | 20 | Install + working example in under 60 seconds |
@@ -26,28 +91,12 @@ readme-surgeon scores your README across 5 categories (0–100 total), tells you
 
 ---
 
-## Quick Start
+## How It Works
 
-```bash
-# Requires Node.js 18+
-npx readme-surgeon https://github.com/user/repo
-```
-
-That's it. You'll get a score card, brutal feedback, and the improved README printed to stdout.
-
----
-
-## Install
-
-```bash
-npm install -g readme-surgeon
-```
-
-Or run without installing:
-
-```bash
-npx readme-surgeon <target>
-```
+1. **Fetch** — reads the README from a GitHub URL (via raw content API) or local path
+2. **Score** — sends it to Claude with a structured rubric; parses the JSON score + feedback bullets
+3. **Improve** — second Claude call rewrites the README fixing every identified issue
+4. **Output** — renders a chalk score card, feedback list, and the improved markdown
 
 ---
 
@@ -81,27 +130,9 @@ npx readme-surgeon --json ./README.md
 
 ---
 
-## Requirements
-
-- Node.js 18+
-- `ANTHROPIC_API_KEY` environment variable set
-
-```bash
-export ANTHROPIC_API_KEY=sk-ant-...
-```
-
----
-
 ## CI Usage
 
-Use `--json` to get machine-readable output:
-
-```bash
-score=$(npx readme-surgeon --json ./README.md | node -e "const d=require('fs').readFileSync('/dev/stdin','utf8'); console.log(JSON.parse(d).total)")
-echo "README score: $score"
-```
-
-Or fail the build if score drops below a threshold:
+Fail the build if your README drops below a threshold:
 
 ```bash
 npx readme-surgeon --json ./README.md | node -e "
@@ -114,63 +145,50 @@ npx readme-surgeon --json ./README.md | node -e "
 
 ---
 
+## Requirements
+
+- Node.js 18+
+- `ANTHROPIC_API_KEY` environment variable
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+```
+
+---
+
 ## We Ran readme-surgeon on Its Own README
 
 Because eating your own dog food is mandatory.
 
 ```
   ┌─────────────────────────────────────────┐
-  │         README SURGEON — REPORT CARD       │
+  │         README SURGEON — REPORT CARD   │
   └─────────────────────────────────────────┘
 
-  First Impression    ████████████  19/20
-  Quick Start         ████████████  18/20
-  Completeness        ████████████  18/20
-  Visual Appeal       ████████████  17/20
-  Honesty             ████████████  20/20
+  First Impression    ████████████████████  19/20
+  Quick Start         ████████████████████  18/20
+  Completeness        ████████████████████  18/20
+  Visual Appeal       █████████████████░░░  17/20
+  Honesty             ████████████████████  20/20
 
   ─────────────────────────────────────────
-  TOTAL               ████████████  92/100
+  TOTAL               ████████████████████  92/100
 
   Grade: A
 
   Verdict: "Solid. The banner doesn't hurt either."
 ```
 
-**Feedback it gave us:**
-
-1. The CI section assumes bash skills most developers have — arguably elitist, but fair.
-2. No screenshot of the actual terminal output. You're telling me you build a CLI with beautiful chalk output and show none of it? Surgeon, heal thyself.
-3. "Brutal README feedback" is doing a lot of work in the tagline. Could be more specific.
-
-We left issue #2 unresolved on purpose. Screenshots are hard to keep fresh in a README. Issue #3 we respectfully disagree with.
-
 ---
 
-## How It Works
+## See Also
 
-1. **Fetch** — reads the README from a GitHub URL or local path
-2. **Score** — sends it to Claude with a structured rubric; parses the JSON + feedback bullets
-3. **Improve** — second Claude call rewrites the README fixing every identified issue
-4. **Output** — renders a chalk score card, feedback list, and the improved markdown
-
-Two separate AI calls: analysis and rewrite are intentionally decoupled so the score isn't influenced by what the rewrite will say.
-
----
-
-## Contributing
-
-1. Fork the repo
-2. `npm install`
-3. `ANTHROPIC_API_KEY=sk-ant-... node bin/surgeon.js ./README.md`
-4. Open a PR
-
-Issues and pull requests welcome. If you find a README that breaks the parser, open an issue with the URL.
+- [ai-code-roast](https://github.com/NickCirv/ai-code-roast) — brutal automated code review for your entire codebase
+- [pr-poet](https://github.com/NickCirv/pr-poet) — auto-generate PR descriptions from your diffs
+- [clone-any-app](https://github.com/NickCirv/clone-any-app) — reverse-engineer any app from its UI
 
 ---
 
 ## License
 
-MIT — see [LICENSE](./LICENSE)
-
-Built by [NickCirv](https://github.com/NickCirv)
+MIT — [NickCirv](https://github.com/NickCirv)
