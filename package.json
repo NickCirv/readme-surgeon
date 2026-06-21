@@ -13,6 +13,7 @@
     "banner.svg"
   ],
   "scripts": {
+    "test": "node --test",
     "start": "node bin/surgeon.js",
     "lint": "node --check src/*.js bin/surgeon.js"
   },
@@ -28,7 +29,7 @@
   "author": "NickCirv",
   "license": "MIT",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.36.3",
