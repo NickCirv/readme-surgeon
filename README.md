@@ -1,46 +1,65 @@
-<div align="center">
+![readme-surgeon — Nicholas Ashkar editorial artwork](assets/nicholas-ashkar/banner.png)
 
 # readme-surgeon
 
-**Score, roast, and auto-fix any README — powered by Claude**
+Ask an Anthropic model to critique and rewrite a local or public GitHub README.
 
-[![license](https://img.shields.io/badge/license-MIT-blue?labelColor=0B0A09)](LICENSE)
-[![node](https://img.shields.io/badge/node-%3E%3D18-green?labelColor=0B0A09)](https://nodejs.org)
+Fetches the requested README, requests a structured score and optionally generates a replacement draft. Score-only and JSON modes support a narrower review.
 
-</div>
 
-## Install
+<a id="install"></a>
+
+## Quickstart
+
+Package runtime requirement: Node.js `>=20`. Git is needed to obtain this pinned source checkout.
 
 ```bash
-# Requires ANTHROPIC_API_KEY
-export ANTHROPIC_API_KEY=sk-ant-...
-
-npx github:NickCirv/readme-surgeon <target>
+git clone https://github.com/NickCirv/readme-surgeon.git
+cd readme-surgeon
+git checkout 8f645ec4416f48616fa287127fc726aeb10a866d
+npm install --ignore-scripts
+node bin/surgeon.js --help
 ```
+
+This source-derived example has not been executed in this review. Help does not call the API. All scoring/generation requires `ANTHROPIC_API_KEY`.
+
+
+<a id="what-it-does"></a>
 
 ## Usage
 
 ```bash
-# Score + roast a GitHub repo
-npx github:NickCirv/readme-surgeon https://github.com/user/repo
-
-# Score + roast a local file
-npx github:NickCirv/readme-surgeon ./README.md
-
-# Overwrite the local file with the improved version
-npx github:NickCirv/readme-surgeon --fix ./README.md
+node bin/surgeon.js ./README.md --score
+node bin/surgeon.js ./README.md --json
+node bin/surgeon.js https://github.com/NickCirv/readme-surgeon
 ```
 
-| Flag | Description |
-|---|---|
-| `--fix` | Overwrite the local file with the improved README |
-| `--score` | Print only the score card, skip the rewrite |
-| `--json` | Output score data as JSON (for CI pipelines) |
-| `-h, --help` | Show help |
+The normal mode prints a proposed rewrite. `--fix` directly overwrites a local file; URL targets reject that option.
 
-## What it does
+[Command reference](docs/REFERENCE.md) covers arguments, modes and output controls.
 
-Fetches a README from a GitHub URL or local path, sends it to Claude with a structured 5-category rubric (first impression, quick start, completeness, visual appeal, honesty), and returns a scored report card with numbered feedback. A second Claude call rewrites the README fixing every identified issue. Use `--fix` to overwrite in place, or `--json` to integrate into CI pipelines.
+## Behavior and limits
 
----
-<sub>Node ≥18 · MIT · by <a href="https://github.com/NickCirv">NickCirv</a></sub>
+The model receives README text, not a verified source-code evidence pack. It can introduce unsupported capabilities, installation instructions or claims. `--fix` does not create a documented backup, so review a draft before replacing a file. GitHub fetching tries known README/branch conventions and is not a complete documentation crawler.
+
+## Development
+
+Declared package scripts:
+
+| Script | Command |
+| --- | --- |
+| `test` | `node --test` |
+| `start` | `node bin/surgeon.js` |
+| `lint` | `node --check src/*.js bin/surgeon.js` |
+
+The smoke test syntax-checks the entrypoint; it does not exercise CLI behavior or integrations.
+
+## Research
+
+[Source review and claim ledger](docs/RESEARCH.md) records revision `8f645ec4416f`, inspected files and verification gaps.
+
+## License and attribution
+
+Protected license and attribution files remain unchanged: [LICENSE](https://github.com/NickCirv/readme-surgeon/blob/8f645ec4416f48616fa287127fc726aeb10a866d/LICENSE).
+
+[Artwork credits](assets/nicholas-ashkar/CREDITS.md) · [Nicholas Ashkar — consulting](https://nicholashkar.com/#oxblood-contact)
